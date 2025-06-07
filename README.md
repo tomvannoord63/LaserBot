@@ -36,7 +36,8 @@ LaserBot/
 
 3. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install poetry
+   poetry install --no-root
    ```
 
 4. Run the development server:

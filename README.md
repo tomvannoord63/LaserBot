@@ -63,12 +63,12 @@ The API will be available at `http://localhost:8000`
 
 3. Start the development server:
    ```bash
-   npm start
+   npm run dev
    # or
-   yarn start
+   yarn dev
    ```
 
-The frontend will be available at `http://localhost:3000`
+The frontend will be available at `http://localhost:5173`
 
 ## Development
 

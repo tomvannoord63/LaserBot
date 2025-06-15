@@ -1,10 +1,18 @@
 import random
 import time
 from threading import Event
-from typing import List, Optional
+from typing import List
 
 from app.robot import robot
-from app.routes.training_routes import Position
+from pydantic import BaseModel
+
+
+class Position(BaseModel):
+    id: str
+    x: float
+    y: float
+    name: str
+    description: str = ""
 
 
 class PositionManager:

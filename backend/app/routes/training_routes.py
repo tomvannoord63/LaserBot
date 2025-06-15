@@ -1,18 +1,10 @@
 from typing import Any, Dict, List
 
-from app.position_manager import position_manager
+from app.position_manager import Position, position_manager
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/training", tags=["training"])
-
-
-class Position(BaseModel):
-    id: str
-    x: float
-    y: float
-    name: str
-    description: str = ""
 
 
 @router.get("/positions")

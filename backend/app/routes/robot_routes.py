@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from app.position_manager import position_manager
 from app.robot import robot
 from fastapi import APIRouter, HTTPException
 
@@ -27,9 +28,24 @@ async def disconnect_robot() -> Dict[str, Any]:
 
 
 @router.post("/start")
-async def start_robot() -> Dict[str, Any]:
+async def start_robot(
+    random_order: bool = True, min_delay: float = 3.0, max_delay: float = 5.0
+) -> Dict[str, Any]:
     try:
-        # TODO: Implement actual robot start logic
+        if position_manager.is_sequence_running():
+            raise HTTPException(status_code=400, detail="A sequence is already running")
+
+        # Start the sequence in a background task
+        import asyncio
+
+        asyncio.create_task(
+            asyncio.to_thread(
+                position_manager.start_sequence,
+                random_order=random_order,
+                min_delay=min_delay,
+                max_delay=max_delay,
+            )
+        )
         return {"status": "running", "message": "Robot started successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -38,7 +54,7 @@ async def start_robot() -> Dict[str, Any]:
 @router.post("/stop")
 async def stop_robot() -> Dict[str, Any]:
     try:
-        robot.stop()
+        position_manager.stop_sequence()
         return {"status": "stopped", "message": "Robot stopped successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -48,10 +64,14 @@ async def stop_robot() -> Dict[str, Any]:
 async def get_robot_status() -> Dict[str, Any]:
     try:
         return {
-            "status": "idle",
+            "status": "running" if position_manager.is_sequence_running() else "idle",
             "connected": robot.socket is not None,
             "laser_on": False,  # You might want to add a state variable to track this
             "position": {"x": robot.current_angles[0], "y": robot.current_angles[1]},
+            "sequence": {
+                "is_running": position_manager.is_sequence_running(),
+                "position_count": len(position_manager.get_positions()),
+            },
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

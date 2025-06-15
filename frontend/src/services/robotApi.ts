@@ -37,8 +37,8 @@ class RobotAPI {
     return this.request('/robot/disconnect', { method: 'POST' });
   }
 
-  async startRobot() {
-    return this.request('/robot/start', { method: 'POST' });
+  async startRobot(randomOrder: boolean = true, minDelay: number = 3.0, maxDelay: number = 5.0) {
+    return this.request(`/robot/start?random_order=${randomOrder}&min_delay=${minDelay}&max_delay=${maxDelay}`, { method: 'POST' });
   }
 
   async stopRobot() {
@@ -51,14 +51,14 @@ class RobotAPI {
 
   // Laser Control
   async toggleLaser(on: boolean) {
-    return this.request('/laser/toggle', {
+    return this.request('/robot/laser/toggle', {
       method: 'POST',
       body: JSON.stringify({ on }),
     });
   }
 
   async moveLaser(x: number, y: number) {
-    return this.request('/laser/move', {
+    return this.request('/robot/laser/move', {
       method: 'POST',
       body: JSON.stringify({ x, y }),
     });
@@ -72,12 +72,12 @@ class RobotAPI {
   async savePositions(positions: any[]) {
     return this.request('/training/positions', {
       method: 'POST',
-      body: JSON.stringify({ positions }),
+      body: JSON.stringify(positions),
     });
   }
 
   async addPosition(position: any) {
-    return this.request('/training/positions', {
+    return this.request('/training/positions/add', {
       method: 'POST',
       body: JSON.stringify(position),
     });

@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from app.robot import robot
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/robot", tags=["robot"])
@@ -9,8 +10,9 @@ router = APIRouter(prefix="/robot", tags=["robot"])
 @router.post("/connect")
 async def connect_robot() -> Dict[str, Any]:
     try:
-        # TODO: Implement actual robot connection logic
-        return {"status": "connected", "message": "Robot connected successfully"}
+        if robot.connect():
+            return {"status": "connected", "message": "Robot connected successfully"}
+        raise HTTPException(status_code=500, detail="Failed to connect to robot")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -18,7 +20,7 @@ async def connect_robot() -> Dict[str, Any]:
 @router.post("/disconnect")
 async def disconnect_robot() -> Dict[str, Any]:
     try:
-        # TODO: Implement actual robot disconnection logic
+        robot.disconnect()
         return {"status": "disconnected", "message": "Robot disconnected successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -36,7 +38,7 @@ async def start_robot() -> Dict[str, Any]:
 @router.post("/stop")
 async def stop_robot() -> Dict[str, Any]:
     try:
-        # TODO: Implement actual robot stop logic
+        robot.stop()
         return {"status": "stopped", "message": "Robot stopped successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -45,12 +47,11 @@ async def stop_robot() -> Dict[str, Any]:
 @router.get("/status")
 async def get_robot_status() -> Dict[str, Any]:
     try:
-        # TODO: Implement actual status check logic
         return {
             "status": "idle",
-            "connected": True,
-            "laser_on": False,
-            "position": {"x": 0, "y": 0},
+            "connected": robot.socket is not None,
+            "laser_on": False,  # You might want to add a state variable to track this
+            "position": {"x": robot.current_angles[0], "y": robot.current_angles[1]},
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -60,7 +61,10 @@ async def get_robot_status() -> Dict[str, Any]:
 @router.post("/laser/toggle")
 async def toggle_laser(on: bool) -> Dict[str, Any]:
     try:
-        # TODO: Implement actual laser toggle logic
+        if on:
+            robot.turn_laser_on()
+        else:
+            robot.turn_laser_off()
         return {"status": "success", "laser_on": on}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -69,7 +73,7 @@ async def toggle_laser(on: bool) -> Dict[str, Any]:
 @router.post("/laser/move")
 async def move_laser(x: float, y: float) -> Dict[str, Any]:
     try:
-        # TODO: Implement actual laser movement logic
+        robot.move_to_angles(x, y)
         return {"status": "success", "position": {"x": x, "y": y}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

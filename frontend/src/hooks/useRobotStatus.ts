@@ -1,12 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
-import { RobotStatus } from '../types/robot';
+import { useCallback, useEffect, useState } from 'react';
 import { robotApi } from '../services/robotApi';
+import { RobotStatus } from '../types/robot';
 
 export const useRobotStatus = () => {
   const [status, setStatus] = useState<RobotStatus>({
     connected: false,
     running: false,
-    laserOn: false,
+    laserOn: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

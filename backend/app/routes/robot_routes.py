@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from app.position_manager import position_manager
 from app.robot import robot
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 router = APIRouter(prefix="/robot", tags=["robot"])
 
@@ -66,7 +66,7 @@ async def get_robot_status() -> Dict[str, Any]:
         return {
             "status": "running" if position_manager.is_sequence_running() else "idle",
             "connected": robot.socket is not None,
-            "laser_on": False,  # You might want to add a state variable to track this
+            "laser_on": robot.laser_on,
             "position": {"x": robot.current_angles[0], "y": robot.current_angles[1]},
             "sequence": {
                 "is_running": position_manager.is_sequence_running(),
@@ -79,7 +79,9 @@ async def get_robot_status() -> Dict[str, Any]:
 
 # Laser Control
 @router.post("/laser/toggle")
-async def toggle_laser(on: bool) -> Dict[str, Any]:
+async def toggle_laser(
+    on: bool = Query(..., description="Whether to turn the laser on or off")
+) -> Dict[str, Any]:
     try:
         if on:
             robot.turn_laser_on()

@@ -24,6 +24,7 @@ class LaserRobot:
         self.socket: Optional[socket.socket] = None
         self.exit_event = Event()
         self.current_angles: Tuple[float, float] = (0.0, 0.0)
+        self.laser_on: bool = False  # Track laser state
 
     def connect(self) -> bool:
         """Establish connection with the robot.
@@ -103,10 +104,12 @@ class LaserRobot:
     def turn_laser_on(self) -> None:
         """Turn the laser on."""
         self.send_command(b"JJON")
+        self.laser_on = True
 
     def turn_laser_off(self) -> None:
         """Turn the laser off."""
         self.send_command(b"JJOF")
+        self.laser_on = False
 
     def set_speed_and_acceleration(self, speed: int, acceleration: int) -> None:
         """Set the robot's speed and acceleration.

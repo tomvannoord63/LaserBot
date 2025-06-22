@@ -68,6 +68,17 @@ export const Training: React.FC = () => {
       duration: 2000,
     };
     setPositions([...positions, newPosition]);
+
+    // Auto-select the new position
+    setSelectedPosition(newPosition.id);
+
+    // Auto-scroll to the bottom after a short delay to ensure the DOM has updated
+    setTimeout(() => {
+      const container = document.querySelector('.max-h-96.overflow-y-auto');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, 100);
   };
 
   const deletePosition = (id: string) => {
@@ -150,7 +161,7 @@ export const Training: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-white">Laser Position Training</h2>
-            <p className="text-gray-400">Click on the training area to add laser positions</p>
+            <p className="text-gray-400">Manage laser positions and test robot movements</p>
           </div>
           <div className="flex space-x-3">
             <ControlButton
@@ -202,129 +213,108 @@ export const Training: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Training Canvas */}
-        <div className="lg:col-span-2">
-          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-            <h3 className="text-lg font-semibold text-white mb-4">Training Area</h3>
-            <div
-              ref={canvasRef}
-              onClick={handleCanvasClick}
-              className="relative w-full h-96 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl border-2 border-dashed border-gray-600 cursor-crosshair overflow-hidden"
-            >
-              {/* Grid lines */}
-              <div className="absolute inset-0 opacity-20">
-                {[...Array(10)].map((_, i) => (
-                  <div key={`v-${i}`} className="absolute w-px h-full bg-gray-500" style={{ left: `${i * 10}%` }} />
-                ))}
-                {[...Array(10)].map((_, i) => (
-                  <div key={`h-${i}`} className="absolute w-full h-px bg-gray-500" style={{ top: `${i * 10}%` }} />
-                ))}
-              </div>
-
-              {/* Position markers */}
-              {positions.map((position) => (
-                <div
-                  key={position.id}
-                  className={`absolute w-4 h-4 rounded-full transform -translate-x-2 -translate-y-2 cursor-pointer transition-all duration-200 ${selectedPosition === position.id
-                    ? 'bg-yellow-400 ring-4 ring-yellow-400/30 scale-125'
-                    : 'bg-red-500 hover:bg-red-400 hover:scale-110'
-                    }`}
-                  style={{
-                    left: `${(position.x + 100) / 2}%`,
-                    top: `${(position.y + 100) / 2}%`,
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPosition(position.id);
-                  }}
-                  title={position.name}
-                />
-              ))}
-
-              {/* Center indicator */}
-              <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-blue-400 rounded-full transform -translate-x-1 -translate-y-1 opacity-50" />
-            </div>
-            <p className="text-sm text-gray-400 mt-2">
-              Click anywhere to add a new laser position. Click existing positions to select them.
-            </p>
+      {/* Position List */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-white">Laser Positions</h3>
+          <div className="text-sm text-gray-400">
+            Robot angles: A1 (horizontal) and A2 (vertical) in degrees
           </div>
         </div>
 
-        {/* Position List */}
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-          <h3 className="text-lg font-semibold text-white mb-4">Positions</h3>
-
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {positions.length === 0 ? (
-              <div className="text-center text-gray-400 py-8">
-                <Plus className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No positions yet</p>
-                <p className="text-sm">Click on the training area to add some</p>
-              </div>
-            ) : (
-              positions.map((position, index) => (
-                <div
-                  key={position.id}
-                  className={`bg-gray-700/50 rounded-xl p-4 border transition-all duration-200 ${selectedPosition === position.id
-                    ? 'border-yellow-400/50 bg-yellow-400/10'
-                    : 'border-gray-600/50 hover:border-gray-500/50'
-                    }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <input
-                      type="text"
-                      value={position.name}
-                      onChange={(e) => updatePosition(position.id, { name: e.target.value })}
-                      className="bg-transparent text-white font-medium text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 rounded px-2 py-1"
-                    />
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => testPosition(position)}
-                        className="p-1 rounded text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Move to position"
-                        disabled={movingToPosition !== null || !robotConnected}
-                      >
-                        {movingToPosition === position.id ? (
-                          <div className="h-3 w-3 animate-spin rounded-full border border-blue-400 border-t-transparent" />
-                        ) : (
-                          <Move className="h-3 w-3" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => testPosition(position)}
-                        className="p-1 rounded text-green-400 hover:text-green-300 hover:bg-green-400/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Test position"
-                        disabled={movingToPosition !== null || !robotConnected}
-                      >
-                        {movingToPosition === position.id ? (
-                          <div className="h-3 w-3 animate-spin rounded-full border border-green-400 border-t-transparent" />
-                        ) : (
-                          <Play className="h-3 w-3" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => deletePosition(position.id)}
-                        className="p-1 rounded text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                        title="Delete position"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </button>
-                    </div>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {positions.length === 0 ? (
+            <div className="text-center text-gray-400 py-12">
+              <Plus className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-medium mb-2">No positions yet</p>
+              <p className="text-sm">Add positions manually or import from a file</p>
+            </div>
+          ) : (
+            positions.map((position, index) => (
+              <div
+                key={position.id}
+                className={`bg-gray-700/50 rounded-xl p-4 border transition-all duration-200 ${selectedPosition === position.id
+                  ? 'border-yellow-400/50 bg-yellow-400/10'
+                  : 'border-gray-600/50 hover:border-gray-500/50'
+                  }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <input
+                    type="text"
+                    value={position.name}
+                    onChange={(e) => updatePosition(position.id, { name: e.target.value })}
+                    className="bg-transparent text-white font-medium text-base focus:outline-none focus:ring-1 focus:ring-blue-400 rounded px-2 py-1"
+                  />
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => testPosition(position)}
+                      className="p-2 rounded text-blue-400 hover:text-blue-300 hover:bg-blue-400/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Move to position"
+                      disabled={movingToPosition !== null || !robotConnected}
+                    >
+                      {movingToPosition === position.id ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border border-blue-400 border-t-transparent" />
+                      ) : (
+                        <Move className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => testPosition(position)}
+                      className="p-2 rounded text-green-400 hover:text-green-300 hover:bg-green-400/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Test position"
+                      disabled={movingToPosition !== null || !robotConnected}
+                    >
+                      {movingToPosition === position.id ? (
+                        <div className="h-4 w-4 animate-spin rounded-full border border-green-400 border-t-transparent" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => deletePosition(position.id)}
+                      className="p-2 rounded text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors"
+                      title="Delete position"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
+                </div>
 
-                  <div className="text-xs text-gray-400 space-y-1">
-                    <div className="flex justify-between">
-                      <span>X: {position.x.toFixed(1)}</span>
-                      <span>Y: {position.y.toFixed(1)}</span>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div>
+                      <label className="block text-gray-400 text-xs mb-1">A1 (Horizontal):</label>
+                      <input
+                        type="number"
+                        value={position.x}
+                        onChange={(e) => updatePosition(position.id, { x: parseFloat(e.target.value) || 0 })}
+                        className="w-full bg-gray-600/50 text-white text-sm rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400 font-mono"
+                        step="0.1"
+                        min="-180"
+                        max="180"
+                      />
                     </div>
                     <div>
-                      <label className="block text-xs mb-1">Duration (ms):</label>
+                      <label className="block text-gray-400 text-xs mb-1">A2 (Vertical):</label>
+                      <input
+                        type="number"
+                        value={position.y}
+                        onChange={(e) => updatePosition(position.id, { y: parseFloat(e.target.value) || 0 })}
+                        className="w-full bg-gray-600/50 text-white text-sm rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400 font-mono"
+                        step="0.1"
+                        min="-180"
+                        max="180"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <label className="block text-gray-400 text-xs mb-1">Duration (ms):</label>
                       <input
                         type="number"
                         value={position.duration || 2000}
                         onChange={(e) => updatePosition(position.id, { duration: parseInt(e.target.value) })}
-                        className="w-full bg-gray-600/50 text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        className="w-full bg-gray-600/50 text-white text-sm rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
                         min="100"
                         max="10000"
                         step="100"
@@ -332,9 +322,20 @@ export const Training: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Add Position Button */}
+        <div className="mt-4 pt-4 border-t border-gray-600/50">
+          <button
+            onClick={() => addPosition(0, 0)}
+            className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 border border-blue-500/30 hover:border-blue-500/50 rounded-xl p-4 transition-all duration-200 flex items-center justify-center space-x-2"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="font-medium">Add New Position</span>
+          </button>
         </div>
       </div>
     </div>

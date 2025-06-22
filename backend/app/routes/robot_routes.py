@@ -86,7 +86,6 @@ async def stop_robot() -> Dict[str, Any]:
 @router.get("/status")
 async def get_robot_status() -> Dict[str, Any]:
     try:
-        print(robot.laser_on)
         return {
             "status": "running" if position_manager.is_sequence_running() else "idle",
             "connected": robot.socket is not None,

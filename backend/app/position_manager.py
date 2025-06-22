@@ -17,7 +17,78 @@ class Position(BaseModel):
 
 class PositionManager:
     def __init__(self):
-        self.positions: List[Position] = []
+        self.positions: List[Position] = [
+            Position(
+                id="position_1",
+                x=0,
+                y=-16,
+                name="Room Center",
+                description="Room center position",
+            ),
+            Position(
+                id="position_2",
+                x=80,
+                y=-52,
+                name="Forward Right",
+                description="Forward and right position",
+            ),
+            Position(
+                id="position_3",
+                x=-77,
+                y=-91,
+                name="Back Left",
+                description="Back and left position",
+            ),
+            Position(
+                id="position_4",
+                x=-77,
+                y=-75,
+                name="Back Center",
+                description="Back center position",
+            ),
+            Position(
+                id="position_5",
+                x=-63,
+                y=-38,
+                name="Mid Back",
+                description="Mid back position",
+            ),
+            Position(
+                id="position_6",
+                x=-40,
+                y=-70,
+                name="Center Square 1",
+                description="Center square 1 position",
+            ),
+            Position(
+                id="position_7",
+                x=0,
+                y=0,
+                name="Home Position",
+                description="Default home position for the robot",
+            ),
+            Position(
+                id="position_8",
+                x=-40,
+                y=-45,
+                name="Center Square 2",
+                description="Center square 2 position",
+            ),
+            Position(
+                id="position_9",
+                x=0,
+                y=-30,
+                name="Center Square 3",
+                description="Center square 3 position",
+            ),
+            Position(
+                id="position_10",
+                x=0,
+                y=-70,
+                name="Center Square 4",
+                description="Center square 4 position",
+            ),
+        ]
         self.exit_event = Event()
         self.is_running = False
 

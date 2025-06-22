@@ -24,7 +24,7 @@ class LaserRobot:
         self.socket: Optional[socket.socket] = None
         self.exit_event = Event()
         self.current_angles: Tuple[float, float] = (0.0, 0.0)
-        self.laser_on: bool = False  # Track laser state
+        self.laser_on: bool = True  # Track laser state
 
     def connect(self) -> bool:
         """Establish connection with the robot.

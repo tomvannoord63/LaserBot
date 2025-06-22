@@ -6,14 +6,22 @@ export const useRobotStatus = () => {
   const [status, setStatus] = useState<RobotStatus>({
     connected: false,
     running: false,
-    laserOn: true,
+    laserOn: true, // Default to on
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStatus = useCallback(async () => {
     try {
-      const robotStatus = await robotApi.getRobotStatus();
+      const backendStatus = await robotApi.getRobotStatus();
+
+      // Map backend response to frontend expected structure
+      const robotStatus: RobotStatus = {
+        connected: backendStatus.connected,
+        running: backendStatus.status === 'running',
+        laserOn: backendStatus.laser_on,
+      };
+
       setStatus(robotStatus);
       setError(null);
     } catch (err) {

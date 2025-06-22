@@ -38,7 +38,10 @@ class RobotAPI {
   }
 
   async startRobot(randomOrder: boolean = true, minDelay: number = 3.0, maxDelay: number = 5.0) {
-    return this.request(`/robot/start?random_order=${randomOrder}&min_delay=${minDelay}&max_delay=${maxDelay}`, { method: 'POST' });
+    return this.request('/robot/start', {
+      method: 'POST',
+      body: JSON.stringify({ random_order: randomOrder, min_delay: minDelay, max_delay: maxDelay }),
+    });
   }
 
   async stopRobot() {
@@ -66,25 +69,25 @@ class RobotAPI {
 
   // Training/Configuration
   async getPositions() {
-    return this.request('/training/positions');
+    return this.request('/robot/training/positions');
   }
 
   async savePositions(positions: any[]) {
-    return this.request('/training/positions', {
+    return this.request('/robot/training/positions', {
       method: 'POST',
       body: JSON.stringify(positions),
     });
   }
 
   async addPosition(position: any) {
-    return this.request('/training/positions/add', {
+    return this.request('/robot/training/positions/add', {
       method: 'POST',
       body: JSON.stringify(position),
     });
   }
 
   async deletePosition(id: string) {
-    return this.request(`/training/positions/${id}`, {
+    return this.request(`/robot/training/positions/${id}`, {
       method: 'DELETE',
     });
   }

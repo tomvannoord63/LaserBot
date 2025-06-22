@@ -1,7 +1,7 @@
 export interface RobotStatus {
   connected: boolean;
   running: boolean;
-  laserOn: boolean;
+  laserOn: boolean; // Defaults to true when robot starts
   battery?: number;
   lastHeartbeat?: Date;
 }

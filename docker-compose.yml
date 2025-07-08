@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for live reloading during development
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/postcss.config.js:/app/postcss.config.js
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.app.json:/app/tsconfig.app.json
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ./frontend/eslint.config.js:/app/eslint.config.js
+    environment:
+      # Configure Vite to allow connections from any host
+      - VITE_HOST=0.0.0.0
+      - VITE_PORT=5173
+      # Backend API URL - use host.docker.internal to reach host machine
+      - VITE_API_BASE_URL=http://host.docker.internal:8000
+    extra_hosts:
+      # Allow container to reach host machine
+      - "host.docker.internal:host-gateway"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: sync
+          path: ./frontend/public
+          target: /app/public
+        - action: rebuild
+          path: ./frontend/package.json

@@ -20,3 +20,7 @@ black = "^25.1.0"
 isort = "^6.0.1"
 pytest = "^8.4.0"
 
+[[tool.poetry.source]]
+name = "piwheels"
+url = "https://www.piwheels.org/simple/"
+

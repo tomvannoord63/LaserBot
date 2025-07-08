@@ -1,8 +1,16 @@
+from contextlib import asynccontextmanager
 from app.routes import robot_routes, training_routes
+from app.database_init import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="LaserBot API")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # Initialize database on startup
+    init_db()
+    yield
+
+app = FastAPI(title="LaserBot API", lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(

@@ -3,6 +3,8 @@ import time
 from threading import Event
 from typing import List
 
+from app.database import SessionLocal
+from app.models.position_model import PositionModel
 from app.robot import robot
 from pydantic import BaseModel
 
@@ -17,96 +19,103 @@ class Position(BaseModel):
 
 class PositionManager:
     def __init__(self):
-        self.positions: List[Position] = [
-            Position(
-                id="position_1",
-                x=0,
-                y=-16,
-                name="Room Center",
-                description="Room center position",
-            ),
-            Position(
-                id="position_2",
-                x=80,
-                y=-52,
-                name="Right of TV",
-                description="Forward and right position",
-            ),
-            Position(
-                id="position_3",
-                x=-77,
-                y=-91,
-                name="Far Left",
-                description="Back and left position",
-            ),
-            Position(
-                id="position_4",
-                x=-77,
-                y=-75,
-                name="By 3D Printer",
-                description="Back center position",
-            ),
-            Position(
-                id="position_5",
-                x=-63,
-                y=-38,
-                name="Water Pump",
-                description="Mid back position",
-            ),
-            Position(
-                id="position_6",
-                x=-40,
-                y=-70,
-                name="Center Square 1",
-                description="Center square 1 position",
-            ),
-            Position(
-                id="position_7",
-                x=0,
-                y=0,
-                name="Home Position",
-                description="Default home position for the robot",
-            ),
-            Position(
-                id="position_8",
-                x=-40,
-                y=-45,
-                name="Center Square 2",
-                description="Center square 2 position",
-            ),
-            Position(
-                id="position_9",
-                x=0,
-                y=-30,
-                name="Center Square 3",
-                description="Center square 3 position",
-            ),
-            Position(
-                id="position_10",
-                x=0,
-                y=-70,
-                name="Center Square 4",
-                description="Center square 4 position",
-            ),
-        ]
         self.exit_event = Event()
         self.is_running = False
 
+    def _get_db(self):
+        """Get a database session."""
+        return SessionLocal()
+
     def add_position(self, position: Position) -> None:
-        """Add a new position to the list."""
-        self.positions.append(position)
+        """Add a new position to the database."""
+        db = self._get_db()
+        try:
+            db_position = PositionModel(
+                id=position.id,
+                x=position.x,
+                y=position.y,
+                name=position.name,
+                description=position.description,
+            )
+            db.add(db_position)
+            db.commit()
+        finally:
+            db.close()
 
     def remove_position(self, position_id: str) -> None:
-        """Remove a position by its ID."""
-        self.positions = [p for p in self.positions if p.id != position_id]
+        """Remove a position by its ID from the database."""
+        db = self._get_db()
+        try:
+            position = (
+                db.query(PositionModel).filter(PositionModel.id == position_id).first()
+            )
+            if position:
+                db.delete(position)
+                db.commit()
+        finally:
+            db.close()
 
     def clear_positions(self) -> None:
-        """Clear all positions."""
-        self.positions.clear()
+        """Clear all positions from the database."""
+        db = self._get_db()
+        try:
+            db.query(PositionModel).delete()
+            db.commit()
+        finally:
+            db.close()
 
     def get_positions(self) -> List[Position]:
-        """Get all positions."""
-        return self.positions
+        """Get all positions from the database."""
+        db = self._get_db()
+        try:
+            db_positions = db.query(PositionModel).all()
+            return [
+                Position(
+                    id=pos.id,
+                    x=pos.x,
+                    y=pos.y,
+                    name=pos.name,
+                    description=pos.description,
+                )
+                for pos in db_positions
+            ]
+        finally:
+            db.close()
+
+    def get_position_by_id(self, position_id: str) -> Position | None:
+        """Get a specific position by ID."""
+        db = self._get_db()
+        try:
+            db_position = (
+                db.query(PositionModel).filter(PositionModel.id == position_id).first()
+            )
+            if db_position:
+                return Position(
+                    id=db_position.id,
+                    x=db_position.x,
+                    y=db_position.y,
+                    name=db_position.name,
+                    description=db_position.description,
+                )
+            return None
+        finally:
+            db.close()
+
+    def update_position(self, position: Position) -> None:
+        """Update an existing position in the database."""
+        db = self._get_db()
+        try:
+            db_position = (
+                db.query(PositionModel).filter(PositionModel.id == position.id).first()
+            )
+            if db_position:
+                db_position.x = position.x
+                db_position.y = position.y
+                db_position.name = position.name
+                db_position.description = position.description
+                db.commit()
+        finally:
+            db.close()
 
     def move_to_position(self, position: Position, delay: float = 0.5) -> None:
         """Move the robot to a specific position."""
@@ -116,7 +125,8 @@ class PositionManager:
         self, random_order: bool = True, min_delay: float = 3.0, max_delay: float = 5.0
     ) -> None:
         """Start a sequence of movements through all positions."""
-        if not self.positions:
+        positions = self.get_positions()
+        if not positions:
             return
 
         self.is_running = True
@@ -125,7 +135,7 @@ class PositionManager:
         try:
             while not self.exit_event.is_set():
                 # Create a sequence of position indices
-                sequence = list(range(len(self.positions)))
+                sequence = list(range(len(positions)))
                 if random_order:
                     random.shuffle(sequence)
 
@@ -134,7 +144,7 @@ class PositionManager:
                     if self.exit_event.is_set():
                         break
 
-                    position = self.positions[idx]
+                    position = positions[idx]
                     delay = random.uniform(min_delay, max_delay)
                     self.move_to_position(position, delay)
 

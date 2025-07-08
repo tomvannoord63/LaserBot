@@ -194,4 +194,12 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Database files
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+CLAUDE.md
+
 .DS_Store

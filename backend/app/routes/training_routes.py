@@ -15,6 +15,7 @@ async def get_positions() -> List[Position]:
 @router.post("/positions")
 async def save_positions(new_positions: List[Position]) -> Dict[str, Any]:
     try:
+        print(f"new positions: {new_positions}")
         position_manager.clear_positions()
         for position in new_positions:
             position_manager.add_position(position)

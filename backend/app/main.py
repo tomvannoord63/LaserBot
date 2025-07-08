@@ -1,8 +1,18 @@
+import logging
 from contextlib import asynccontextmanager
 from app.routes import robot_routes, training_routes
 from app.database_init import init_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+    ]
+)
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):

@@ -29,7 +29,7 @@ export const Training: React.FC = () => {
   const loadPositions = async () => {
     try {
       const data = await robotApi.getPositions();
-      setPositions(data.positions || []);
+      setPositions(data || []);
     } catch (err) {
       setError('Failed to load positions');
       console.error('Load positions error:', err);

@@ -69,25 +69,25 @@ class RobotAPI {
 
   // Training/Configuration
   async getPositions() {
-    return this.request('/robot/training/positions');
+    return this.request('/training/positions');
   }
 
   async savePositions(positions: any[]) {
-    return this.request('/robot/training/positions', {
+    return this.request('/training/positions', {
       method: 'POST',
       body: JSON.stringify(positions),
     });
   }
 
   async addPosition(position: any) {
-    return this.request('/robot/training/positions/add', {
+    return this.request('/training/positions/add', {
       method: 'POST',
       body: JSON.stringify(position),
     });
   }
 
   async deletePosition(id: string) {
-    return this.request(`/robot/training/positions/${id}`, {
+    return this.request(`/training/positions/${id}`, {
       method: 'DELETE',
     });
   }

@@ -82,6 +82,16 @@ The frontend will be available at `http://localhost:5173`
 - Main application code is in `frontend/src/App.js`
 - API service calls are in `frontend/src/services/`
 
+### Docker Deployment
+  1. Start your backend (in one terminal):
+  cd backend
+  uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  2. Start the frontend (in another terminal):
+  ./start-docker.sh
+  3. Access the apps:
+    - Frontend: http://localhost:5173
+    - Backend: http://localhost:8000
+
 ## Production Deployment
 
 For production deployment on the Raspberry Pi:

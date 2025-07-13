@@ -34,14 +34,26 @@ sudo systemctl daemon-reload
 sudo systemctl enable laserbot-backend.service
 ```
 
-### 5. Start Services
-```bash
-# Option 1: Use startup script
-./deployment/startup.sh
+### 5. Deploy Frontend and Start Services
 
-# Option 2: Manual start
+#### Option 1: Deploy from development machine (recommended for ARMv6l)
+```bash
+# From your development machine, run:
+./deployment/deploy.sh [pi-hostname] [pi-username]
+# Example: ./deployment/deploy.sh raspberrypi.local bot
+```
+
+#### Option 2: Manual deployment
+```bash
+# Build frontend locally
+cd frontend && npm run build
+
+# Copy files to Pi
+rsync -avz dist/ bot@raspberrypi.local:/home/bot/LaserBot/frontend/dist/
+
+# On Pi, start services
 sudo systemctl start laserbot-backend.service
-docker compose -f deployment/docker-compose.prod.yml up -d
+docker compose -f deployment/docker-compose.prod.yml up -d --build
 ```
 
 ## Access

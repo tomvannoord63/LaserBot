@@ -3,7 +3,7 @@
 ## Prerequisites
 - Raspberry Pi with Raspberry Pi OS
 - Docker and Docker Compose installed
-- Poetry installed for Python dependency management
+- uv installed for Python dependency management
 - User account: `bot` (as configured in systemd service)
 
 ## Installation Steps
@@ -18,7 +18,7 @@ cd LaserBot
 ### 2. Install Backend Dependencies
 ```bash
 cd backend
-poetry install --no-root
+uv sync
 ```
 
 ### 3. Create Environment File
@@ -27,20 +27,14 @@ cp .env.example .env
 # Edit .env to set ROBOT_IP_ADDRESS
 ```
 
-### 4. Initialize Database
-```bash
-cd backend
-python init_database.py
-```
-
-### 5. Install Systemd Service
+### 4. Install Systemd Service
 ```bash
 sudo cp deployment/laserbot-backend.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable laserbot-backend.service
 ```
 
-### 6. Start Services
+### 5. Start Services
 ```bash
 # Option 1: Use startup script
 ./deployment/startup.sh

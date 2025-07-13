@@ -41,7 +41,7 @@ sudo systemctl enable laserbot-backend.service
 
 # Option 2: Manual start
 sudo systemctl start laserbot-backend.service
-docker-compose -f deployment/docker-compose.prod.yml up -d
+docker compose -f deployment/docker-compose.prod.yml up -d
 ```
 
 ## Access
@@ -54,11 +54,11 @@ docker-compose -f deployment/docker-compose.prod.yml up -d
 sudo systemctl status laserbot-backend.service
 
 # Check frontend container
-docker-compose -f deployment/docker-compose.prod.yml ps
+docker compose -f deployment/docker-compose.prod.yml ps
 
 # View logs
 sudo journalctl -u laserbot-backend.service -f
-docker-compose -f deployment/docker-compose.prod.yml logs -f
+docker compose -f deployment/docker-compose.prod.yml logs -f
 ```
 
 ## Auto-start on Boot

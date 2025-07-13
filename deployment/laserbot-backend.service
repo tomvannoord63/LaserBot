@@ -1,0 +1,20 @@
+[Unit]
+Description=LaserBot Backend FastAPI Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=bot
+Group=bot
+WorkingDirectory=/home/bot/LaserBot/backend
+Environment=PATH=/home/bot/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStartPre=/bin/sleep 10
+ExecStart=/home/bot/.local/bin/poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

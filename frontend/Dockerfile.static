@@ -1,6 +1,11 @@
 # Simple nginx container for pre-built files
 FROM nginx:alpine
 
+# Debug: List what Docker can see
+RUN echo "=== Docker build context contents ==="
+COPY . /tmp/debug
+RUN ls -la /tmp/debug
+
 # Copy pre-built files
 COPY dist /usr/share/nginx/html
 

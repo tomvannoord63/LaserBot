@@ -1,15 +1,17 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'; // Use environment variable or fallback to localhost
+const USE_PROXY = import.meta.env.PROD; // Use proxy in production
 
 class RobotAPI {
   private baseUrl: string;
 
   constructor(baseUrl: string = API_BASE_URL) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = USE_PROXY ? '' : baseUrl; // Use relative URLs in production for proxy
   }
 
   async request(endpoint: string, options: RequestInit = {}) {
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const url = USE_PROXY ? `/api${endpoint}` : `${this.baseUrl}${endpoint}`;
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...options.headers,

@@ -11,7 +11,7 @@ PROJECT_PATH="/home/$PI_USER/LaserBot"
 
 echo "Building frontend locally..."
 cd frontend
-npm run build
+VITE_API_BASE_URL="http://$PI_HOST:8000" npm run build
 
 echo "Copying built files to Pi..."
 rsync -avz --delete dist/ "$PI_USER@$PI_HOST:$PROJECT_PATH/frontend/dist/"

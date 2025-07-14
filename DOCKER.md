@@ -5,23 +5,20 @@ This setup allows you to run the frontend in a Docker container with Node.js 18 
 ## Prerequisites
 
 - Docker and Docker Compose installed
-- Backend dependencies installed (Poetry)
+- Backend dependencies installed (uv package manager)
 
 ## Quick Start
 
 1. **Start the backend** (in one terminal):
    ```bash
    cd backend
-   poetry install --no-root
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   uv sync
+   uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 2. **Start the frontend** (in another terminal):
    ```bash
-   # Option 1: Use the helper script
-   ./start-docker.sh
-   
-   # Option 2: Use Docker Compose directly
+   # Use Docker Compose directly
    docker-compose up --build
    ```
 
@@ -33,7 +30,7 @@ This setup allows you to run the frontend in a Docker container with Node.js 18 
 
 - The frontend source code is mounted as a volume, so changes are reflected immediately
 - The container will rebuild automatically when you change files
-- Backend runs natively on your system with your existing Node.js v11.15.0
+- Backend runs natively on your system using uv for Python dependency management
 
 ## Docker Commands
 

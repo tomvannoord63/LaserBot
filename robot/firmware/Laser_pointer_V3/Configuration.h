@@ -62,7 +62,7 @@
 #define ROBOT_INITIAL_POSITION_M1 0
 #define ROBOT_INITIAL_POSITION_M2 0
 
-#define TELEMETRY "YOUR COMMUNICATIONS TERMINAL"
+#define TELEMETRY "192.168.1.255"  // Broadcast to all devices on subnet
 
 #define MINIMUN_TIMER_PERIOD 32000 // For timer counters 
 

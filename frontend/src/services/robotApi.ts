@@ -93,6 +93,18 @@ class RobotAPI {
       method: 'DELETE',
     });
   }
+
+  // Speed Control
+  async setSpeed(speed: number, acceleration: number) {
+    return this.request('/robot/speed', {
+      method: 'POST',
+      body: JSON.stringify({ speed, acceleration }),
+    });
+  }
+
+  async getSpeed() {
+    return this.request('/robot/speed');
+  }
 }
 
 export const robotApi = new RobotAPI();

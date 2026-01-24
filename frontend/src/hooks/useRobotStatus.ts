@@ -56,10 +56,10 @@ export const useRobotStatus = () => {
     }
   };
 
-  const start = async () => {
+  const start = async (randomOrder: boolean = true, minDelay: number = 3.0, maxDelay: number = 5.0) => {
     setLoading(true);
     try {
-      await robotApi.startRobot();
+      await robotApi.startRobot(randomOrder, minDelay, maxDelay);
       await fetchStatus();
       setError(null);
     } catch (err) {

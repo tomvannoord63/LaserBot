@@ -104,10 +104,12 @@ class PositionManager:
 
     def get_positions(self) -> List[Position]:
         """Get all positions from the database."""
-        logger.debug("Fetching all positions from database")
+        import os
+        logger.info(f"Fetching all positions from database. Current working directory: {os.getcwd()}")
         db = self._get_db()
         try:
             db_positions = db.query(PositionModel).all()
+            logger.info(f"Raw database query returned {len(db_positions)} positions")
             positions = [
                 Position(
                     id=pos.id,
@@ -118,7 +120,7 @@ class PositionManager:
                 )
                 for pos in db_positions
             ]
-            logger.debug(f"Found {len(positions)} positions in database")
+            logger.info(f"Successfully converted to {len(positions)} Position objects")
             return positions
         except Exception as e:
             logger.error(f"Error fetching positions: {str(e)}")
@@ -195,7 +197,7 @@ class PositionManager:
         positions = self.get_positions()
         if not positions:
             logger.warning("No positions available for sequence")
-            return
+            raise ValueError("Cannot start sequence: No positions have been saved. Please add positions in the Training page first.")
 
         logger.info(f"Starting sequence with {len(positions)} positions")
         self.is_running = True

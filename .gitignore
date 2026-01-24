@@ -203,3 +203,6 @@ backend/data/
 CLAUDE.md
 
 .DS_Store
+
+# Arduino secrets (WiFi credentials)
+*secrets.h

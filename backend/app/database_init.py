@@ -1,5 +1,6 @@
 from app.database import SessionLocal, engine
 from app.models.position_model import PositionModel
+from app.models.settings_model import SettingsModel
 from app.position_manager import Position  # Import the Pydantic model for initial data
 
 
@@ -7,6 +8,11 @@ def init_db():
     """Initialize the database with tables and default data."""
     # Create all tables
     PositionModel.metadata.create_all(bind=engine)
+    SettingsModel.metadata.create_all(bind=engine)
+
+    # Initialize default settings
+    from app.settings_manager import settings_manager
+    settings_manager.ensure_defaults()
 
     # Check if we already have data
     db = SessionLocal()

@@ -27,6 +27,7 @@
 
 // ROBOT and USER configuration parameters
 #include "Configuration.h"
+#include "secrets.h"
 #include <Servo.h>
 #include <Wire.h>
 
@@ -98,11 +99,11 @@ void setup()
   //SerialUSB.println("Aqui tambien");
   // Generate Soft AP. SSID=JJROBOTS_XX (XX= user MAC last characters), PASS=87654321
   //String cmd =  String("AT+CWSAP=\"JJROBOTS_") + MAC.substring(MAC.length() - 2, MAC.length()) + String("\",\"87654321\",5,3");
-  String cmd = String("AT+CWJAP=\"YOUR SSID\",\"YOUR PASSWORD\"");
+  String cmd = String("AT+CWJAP=\"") + String(WIFI_SSID) + String("\",\"") + String(WIFI_PASSWORD) + String("\"");
   ESPsendCommand(cmd, String("OK"), 6);
 
   // Set the IP address of the station
-  String IP = String("AT+CIPSTA=\"ESP IP ADDRESS\",\"GATEWAY IP ADDRESS\",\"SUBNET MASK\"");
+  String IP = String("AT+CIPSTA=\"") + String(ROBOT_STATIC_IP) + String("\",\"") + String(GATEWAY_IP) + String("\",\"") + String(SUBNET_MASK) + String("\"");
   ESPsendCommand(IP, String("OK"), 5);
 
   // Start UDP SERVER on port 2222, telemetry port 2223
@@ -288,9 +289,9 @@ void loop()
       actual_angleA2 = (position_M2 / M2_AXIS_STEPS_PER_UNIT) * 10;
 
       //SerialUSB.println(message);
-      //if (enable_udp_output) {       // Output UDP messages if we detect an UDP external interface
-      //  Serial1.println(message);
-      //}
+      if (enable_udp_output) {       // Output UDP messages if we detect an UDP external interface
+        Serial1.println(message);
+      }
     } // 20hz loop
   } // 1Khz loop
 }

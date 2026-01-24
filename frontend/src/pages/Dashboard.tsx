@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Square, Wifi, WifiOff, Zap, ZapOff, RefreshCw, AlertCircle } from 'lucide-react';
 import { useRobotStatus } from '../hooks/useRobotStatus';
 import { StatusIndicator } from '../components/StatusIndicator';
 import { ControlButton } from '../components/ControlButton';
+import { SpeedControl } from '../components/SpeedControl';
+import { robotApi } from '../services/robotApi';
 
 export const Dashboard: React.FC = () => {
   const { status, loading, error, connect, disconnect, start, stop, toggleLaser, refresh } = useRobotStatus();
+  const [speed, setSpeed] = useState(50);
+  const [acceleration, setAcceleration] = useState(70);
+  const [speedLoading, setSpeedLoading] = useState(false);
+  const [speedError, setSpeedError] = useState<string | null>(null);
+
+  // Load speed settings on mount
+  useEffect(() => {
+    const loadSpeedSettings = async () => {
+      try {
+        const settings = await robotApi.getSpeed();
+        setSpeed(settings.speed);
+        setAcceleration(settings.acceleration);
+      } catch (err) {
+        console.error('Failed to load speed settings:', err);
+      }
+    };
+    loadSpeedSettings();
+  }, []);
+
+  const handleApplySpeed = async () => {
+    setSpeedLoading(true);
+    setSpeedError(null);
+    try {
+      await robotApi.setSpeed(speed, acceleration);
+    } catch (err) {
+      setSpeedError('Failed to set speed');
+      console.error('Speed control error:', err);
+    } finally {
+      setSpeedLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -106,7 +139,7 @@ export const Dashboard: React.FC = () => {
               <ControlButton
                 icon={Play}
                 label="Start Robot"
-                onClick={start}
+                onClick={() => start()}
                 variant="success"
                 disabled={!status.connected || loading}
                 loading={loading}
@@ -142,6 +175,26 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Speed Control Section */}
+      <SpeedControl
+        speed={speed}
+        acceleration={acceleration}
+        onSpeedChange={setSpeed}
+        onAccelerationChange={setAcceleration}
+        onApply={handleApplySpeed}
+        disabled={!status.connected}
+        loading={speedLoading}
+      />
+
+      {speedError && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+          <div className="flex items-center space-x-2">
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <span className="text-red-300">{speedError}</span>
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

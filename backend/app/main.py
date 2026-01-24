@@ -22,19 +22,14 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="LaserBot API", lifespan=lifespan)
 
-# Configure CORS
+# Configure CORS - allow all origins for development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # React default port
-        "http://localhost:5173",  # Vite default port
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "http://0.0.0.0:5173",    # Docker container origin
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Must be False when allow_origins is ["*"]
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers
